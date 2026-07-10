@@ -1,16 +1,39 @@
-# React + Vite
+# client
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Frontend del chat en tiempo real. React + Vite, conectado al backend por WebSocket.
 
-Currently, two official plugins are available:
+## Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React
+- Vite
 
-## React Compiler
+## Estructura
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```
+client/
+├── package.json
+├── index.html
+└── src/
+    ├── main.jsx           # Punto de entrada, monta <App />
+    ├── App.jsx             # Pantalla de "Entrar al chat" (pide username) -> renderiza <Chat />
+    ├── Chat.jsx            # UI del chat: header, mensajes, input
+    ├── Chat.css            # Estilos del chat
+    ├── useWebSocket.js     # Hook que maneja la conexión WS, mensajes y estado de conexión
+    └── index.css           # Reset mínimo de estilos
+```
 
-## Expanding the Oxlint configuration
+## Qué se configuró
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+- `useWebSocket.js`: se conecta a `ws://localhost:8080/chat`, escucha mensajes (`message` y `system`), expone `sendMessage(username, text)`
+- `App.jsx`: pide un nombre de usuario (mínimo 2 caracteres) antes de entrar al chat
+- `Chat.jsx`: muestra estado de conexión (punto verde/rojo), contador de usuarios conectados, y los mensajes en burbujas (propios vs. de otros)
+- `index.css`: se reemplazó el CSS default de Vite por un reset simple para no chocar con los estilos del chat
+
+## Cómo correrlo
+
+```
+npm install
+npm run dev
+```
+
+Levanta en `http://localhost:5173`. Necesita el `ws-server` corriendo aparte (puerto 8080) para que el chat funcione.
