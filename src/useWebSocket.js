@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 
-const WS_URL = 'ws://localhost:8080/chat';
+const WS_BASE = 'ws://localhost:8080/chat';
 
-export function useWebSocket(username, avatar) {
+export function useWebSocket(username, avatar, room) {
   // Estado principal
   const [messages, setMessages] = useState([]);
   const [connected, setConnected] = useState(false);
@@ -12,12 +12,16 @@ export function useWebSocket(username, avatar) {
   const wsRef = useRef(null);
 
   useEffect(() => {
-    // Crear la conexión WebSocket
-    const ws = new WebSocket(WS_URL);
+    // Cada sala es una conexión nueva — no hay historial entre salas
+    setMessages([]);
+    setConnected(false);
+
+    // Crear la conexión WebSocket a la sala actual
+    const ws = new WebSocket(`${WS_BASE}/${room}`);
     wsRef.current = ws;
 
     ws.onopen = () => {
-      console.log('✅ Conectado al servidor WS');
+      console.log(`✅ Conectado a la sala "${room}"`);
       setConnected(true);
     };
 
@@ -25,7 +29,7 @@ export function useWebSocket(username, avatar) {
       const msg = JSON.parse(event.data);
 
       if (msg.type === 'system') {
-        // Actualizar contador de usuarios
+        // Actualizar contador de usuarios de ESTA sala
         setUserCount(msg.count);
         // Agregar como mensaje de sistema en el chat
         setMessages((prev) => [...prev, { ...msg, id: crypto.randomUUID() }]);
@@ -57,13 +61,14 @@ export function useWebSocket(username, avatar) {
 
     ws.onerror = (e) => console.error('WS Error:', e);
 
-    // Cleanup: cerrar socket al desmontar el componente
+    // Cleanup: cerrar socket al desmontar o al cambiar de sala
     return () => ws.close();
-  }, []); // [] = solo se ejecuta una vez al montar
+  }, [room]); // se reconecta cada vez que cambia la sala
 
-  // Función para enviar mensajes al servidor
-  const sendMessage = useCallback((text) => {
+  // Función para enviar mensajes al servidor (texto y/o imagen)
+  const sendMessage = useCallback((text, imageData = null) => {
     if (wsRef.current?.readyState !== WebSocket.OPEN) return;
+    if (!text && !imageData) return;
 
     const clientId = crypto.randomUUID();
 
@@ -77,12 +82,13 @@ export function useWebSocket(username, avatar) {
         username,
         avatar,
         text,
+        imageData,
         timestamp: new Date().toISOString(),
         status: 'sent',
       },
     ]);
 
-    wsRef.current.send(JSON.stringify({ clientId, username, avatar, text }));
+    wsRef.current.send(JSON.stringify({ clientId, username, avatar, text, imageData }));
   }, [username, avatar]);
 
   return { messages, connected, userCount, sendMessage };

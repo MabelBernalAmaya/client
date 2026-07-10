@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useWebSocket } from './useWebSocket';
+import { resizeImage } from './resizeImage';
 import './Chat.css';
 
 // ── Chulitos estilo WhatsApp ──
@@ -15,10 +16,11 @@ function Ticks({ status }) {
   return null;
 }
 
-export default function Chat({ username, avatar }) {
-  const { messages, connected, userCount, sendMessage } = useWebSocket(username, avatar);
+export default function Chat({ username, avatar, room }) {
+  const { messages, connected, userCount, sendMessage } = useWebSocket(username, avatar, room);
   const [input, setInput] = useState('');
   const bottomRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   // Auto-scroll al último mensaje
   useEffect(() => {
@@ -35,6 +37,22 @@ export default function Chat({ username, avatar }) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
+    }
+  };
+
+  const handlePickImage = () => fileInputRef.current?.click();
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = ''; // para poder elegir la misma imagen otra vez después
+    if (!file || !file.type.startsWith('image/')) return;
+
+    try {
+      const dataUrl = await resizeImage(file);
+      sendMessage(input.trim(), dataUrl);
+      setInput('');
+    } catch (err) {
+      console.error('No se pudo procesar la imagen:', err);
     }
   };
 
@@ -80,7 +98,10 @@ export default function Chat({ username, avatar }) {
                 </div>
               )}
               <div className="msg-bubble">
-                {msg.text}
+                {msg.imageData && (
+                  <img src={msg.imageData} alt="imagen enviada" className="msg-image" />
+                )}
+                {msg.text && <span className="msg-text">{msg.text}</span>}
                 {msg.type !== 'system' && msg.username === username && (
                   <Ticks status={msg.status} />
                 )}
@@ -97,13 +118,28 @@ export default function Chat({ username, avatar }) {
       {/* ── Input ── */}
       <footer className="chat-footer">
         <input
+          type="file"
+          accept="image/*"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+          hidden
+        />
+        <button
+          type="button"
+          className="attach-btn"
+          onClick={handlePickImage}
+          disabled={!connected}
+          title="Enviar imagen"
+        >
+          📎
+        </button>
+        <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKey}
           placeholder="> escribe un mensaje..."
           disabled={!connected}
-          autoFocus
         />
         <button
           onClick={handleSend}
