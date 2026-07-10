@@ -2,8 +2,21 @@ import { useState, useEffect, useRef } from 'react';
 import { useWebSocket } from './useWebSocket';
 import './Chat.css';
 
-export default function Chat({ username }) {
-  const { messages, connected, userCount, sendMessage } = useWebSocket();
+// ── Chulitos estilo WhatsApp ──
+// 'sent'      → 1 check (mandado, esperando confirmación del server)
+// 'delivered' → 2 checks (el server ya lo re-transmitió a todos)
+function Ticks({ status }) {
+  if (status === 'delivered') {
+    return <span className="ticks ticks-delivered">✓✓</span>;
+  }
+  if (status === 'sent') {
+    return <span className="ticks ticks-sent">✓</span>;
+  }
+  return null;
+}
+
+export default function Chat({ username, avatar }) {
+  const { messages, connected, userCount, sendMessage } = useWebSocket(username, avatar);
   const [input, setInput] = useState('');
   const bottomRef = useRef(null);
 
@@ -14,7 +27,7 @@ export default function Chat({ username }) {
 
   const handleSend = () => {
     if (!input.trim()) return;
-    sendMessage(username, input.trim());
+    sendMessage(input.trim());
     setInput('');
   };
 
@@ -27,16 +40,20 @@ export default function Chat({ username }) {
 
   return (
     <div className="chat-container">
+      <div className="chat-scanlines" />
 
       {/* ── Barra superior ── */}
       <header className="chat-header">
         <div className="header-left">
           <span className={`status-dot ${connected ? 'online' : 'offline'}`} />
-          <h1>ChatWS</h1>
+          <h1>CHAT_WS</h1>
         </div>
         <div className="header-right">
-          <span className="user-count">👥 {userCount}</span>
-          <span className="username-badge">{username}</span>
+          <span className="user-count">◈ {userCount}</span>
+          <span className="username-badge">
+            <span className="username-avatar">{avatar}</span>
+            {username}
+          </span>
         </div>
       </header>
 
@@ -50,15 +67,28 @@ export default function Chat({ username }) {
               msg.username === username ? 'mine' : 'theirs'
             }`}
           >
-            {msg.type !== 'system' && (
-              <div className="msg-meta">
-                <span className="msg-author">{msg.username}</span>
-                <span className="msg-time">
-                  {new Date(msg.timestamp).toLocaleTimeString()}
-                </span>
-              </div>
+            {msg.type !== 'system' && msg.username !== username && (
+              <span className="msg-avatar">{msg.avatar}</span>
             )}
-            <div className="msg-bubble">{msg.text}</div>
+            <div className="msg-body">
+              {msg.type !== 'system' && (
+                <div className="msg-meta">
+                  <span className="msg-author">{msg.username}</span>
+                  <span className="msg-time">
+                    {new Date(msg.timestamp).toLocaleTimeString()}
+                  </span>
+                </div>
+              )}
+              <div className="msg-bubble">
+                {msg.text}
+                {msg.type !== 'system' && msg.username === username && (
+                  <Ticks status={msg.status} />
+                )}
+              </div>
+            </div>
+            {msg.type !== 'system' && msg.username === username && (
+              <span className="msg-avatar">{msg.avatar}</span>
+            )}
           </div>
         ))}
         <div ref={bottomRef} />
@@ -71,7 +101,7 @@ export default function Chat({ username }) {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKey}
-          placeholder="Escribe un mensaje... (Enter para enviar)"
+          placeholder="> escribe un mensaje..."
           disabled={!connected}
           autoFocus
         />
@@ -79,7 +109,7 @@ export default function Chat({ username }) {
           onClick={handleSend}
           disabled={!connected || !input.trim()}
         >
-          Enviar
+          ENVIAR
         </button>
       </footer>
 

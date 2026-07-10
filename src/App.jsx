@@ -1,52 +1,62 @@
 import { useState } from 'react';
 import Chat from './Chat';
+import './Chat.css';
+
+export const AVATARS = ['🤖', '👾', '💀', '👁️', '⚡', '🔥', '🐍', '🎭'];
 
 export default function App() {
   const [username, setUsername] = useState('');
+  const [avatar, setAvatar] = useState(AVATARS[0]);
   const [entered, setEntered] = useState(false);
 
   const handleEnter = () => {
     if (username.trim().length >= 2) setEntered(true);
   };
 
-  if (entered) return <Chat username={username} />;
+  if (entered) return <Chat username={username.trim()} avatar={avatar} />;
 
   return (
-    <div style={{
-      display: 'flex', flexDirection: 'column',
-      alignItems: 'center', justifyContent: 'center',
-      height: '100vh', gap: '16px',
-      background: '#0d1117', color: '#e6edf3'
-    }}>
-      <h2 style={{ fontSize: '1.5rem', fontWeight: 700 }}>
-        Entrar al Chat
-      </h2>
-      <input
-        type="text"
-        placeholder="Tu nombre de usuario"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        onKeyDown={(e) => e.key === 'Enter' && handleEnter()}
-        autoFocus
-        style={{
-          padding: '12px 16px', borderRadius: '8px',
-          border: '1px solid #30363d', background: '#161b22',
-          color: '#e6edf3', fontSize: '16px', width: '280px',
-          outline: 'none'
-        }}
-      />
-      <button
-        onClick={handleEnter}
-        disabled={username.trim().length < 2}
-        style={{
-          padding: '12px 28px', borderRadius: '8px',
-          border: 'none', background: '#58a6ff',
-          color: '#0d1117', fontWeight: 700,
-          fontSize: '15px', cursor: 'pointer'
-        }}
-      >
-        Entrar →
-      </button>
+    <div className="entry-screen">
+      <div className="entry-scanlines" />
+      <div className="entry-card">
+        <div className="entry-badge">// ACCESO_TERMINAL</div>
+        <h2 className="entry-title" data-text="CHAT_WS">CHAT_WS</h2>
+        <p className="entry-sub">Identifícate para conectarte a la red</p>
+
+        <input
+          type="text"
+          placeholder="nombre_de_usuario"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && handleEnter()}
+          autoFocus
+          className="entry-input"
+        />
+
+        <div className="avatar-picker">
+          <span className="avatar-picker-label">Elige tu avatar</span>
+          <div className="avatar-grid">
+            {AVATARS.map((a) => (
+              <button
+                type="button"
+                key={a}
+                className={`avatar-option ${avatar === a ? 'selected' : ''}`}
+                onClick={() => setAvatar(a)}
+              >
+                {a}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <button
+          className="entry-btn"
+          onClick={handleEnter}
+          disabled={username.trim().length < 2}
+        >
+          CONECTAR →
+        </button>
+      </div>
     </div>
   );
 }
