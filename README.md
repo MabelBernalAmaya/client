@@ -90,46 +90,46 @@ Las imágenes van en una carpeta `screenshots/` en la raíz de este repo, con es
 
 **Pantalla de entrada** (nombre y avatar):
 
-![Entrada](screenshots/entrada.png)
+![Entrada](https://github.com/MabelBernalAmaya/client/blob/main/images/inicio%20chat%20.png)
 
 **Chat en modo oscuro:**
 
-![Chat oscuro](screenshots/chat-oscuro.png)
+![Chat oscuro](https://github.com/MabelBernalAmaya/client/blob/main/images/chat.png)
 
 **Chat en modo claro:**
 
-![Chat claro](screenshots/chat-claro.png)
+![Chat claro](https://github.com/MabelBernalAmaya/client/blob/main/images/chat%20blanca.png)
 
 **Envío de una imagen:**
 
-![Subida de imagen](screenshots/subir-imagen.png)
+![Subida de imagen](https://github.com/MabelBernalAmaya/client/blob/main/images/subir%20archivos%20al%20chat.png)
 
 ### Capturas de la observabilidad
 
 **Docker Desktop** con los contenedores corriendo:
 
-![Docker Desktop](screenshots/docker-desktop.png)
+![Docker Desktop](https://github.com/MabelBernalAmaya/client/blob/main/images/docker%20obserbability.png)
 
 **Grafana** — mensajes enviados en total:
 
-![Grafana mensajes totales](screenshots/grafana-mensajes-total.png)
+![Grafana mensajes totales](https://github.com/MabelBernalAmaya/client/blob/main/images/mensajes%20enviados%20.png)
 
 **Grafana** — mensajes por segundo:
 
-![Grafana mensajes por segundo](screenshots/grafana-mensajes-segundo.png)
+![Grafana mensajes por segundo](https://github.com/MabelBernalAmaya/client/blob/main/images/mensajes%20recibidos.png)
 
 **Grafana** — sesiones activas:
 
-![Grafana sesiones activas](screenshots/grafana-sesiones.png)
+![Grafana sesiones activas](https://github.com/MabelBernalAmaya/client/blob/main/images/sesiones%20activas.png)
 
 **Zipkin** — lista de trazas:
 
-![Zipkin lista](screenshots/zipkin-lista.png)
+![Zipkin lista](https://github.com/MabelBernalAmaya/client/blob/main/images/zipkin%20ws%20server%20.png)
 
 **Zipkin** — detalle de una traza:
 
-![Zipkin detalle](screenshots/zipkin-detalle.png)
+![Zipkin detalle](https://github.com/MabelBernalAmaya/client/blob/main/images/zipkin%20prometheurs%20.png)
 
 **Kibana** — logs del backend:
 
-![Kibana](screenshots/kibana-discover.png)
+![Kibana](https://github.com/MabelBernalAmaya/client/blob/main/images/kibana%20discover%20.png)
